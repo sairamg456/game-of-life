@@ -8,6 +8,9 @@ pipeline {
     triggers {
         pollSCM('* * * * *')
     }
+    parameters {
+        choice(name: 'GOAL', choices: ['package', 'clean package', 'install', 'clean install'], description: 'this mvn package')
+    }
     tools {
         jdk 'JDK_8'
     }
@@ -20,7 +23,7 @@ pipeline {
         }
         stage ('build and package'){
             steps {
-                sh script: 'mvn package'
+                sh script: "mvn ${params.GOAL}"
             }
         }
         stage ('test results'){
@@ -28,6 +31,18 @@ pipeline {
                 junit testResults: '**/surefire-reports/TEST-*.xml'
                 archiveArtifacts artifacts: '**/target/gameoflife*.war'
             }
+        }
+    }
+    post {
+        success {
+            mail subject: "${JOB_NAME} is effective",
+                 body: "Project build url is ${BUILD_URL}",
+                 to: 'all@jenkins.com'
+        }
+        failure {
+            mail subject: "${JOB_NAME} is deffective",
+                 body: "Project build url is ${BUILD_URL}",
+                 to: 'all@jenkins.com'
         }
     }
 }
