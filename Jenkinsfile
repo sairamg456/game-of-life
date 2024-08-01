@@ -1,5 +1,7 @@
 pipeline {
-    agent { lable 'JDK'}
+    agent 
+    { 
+     label 'JDK'}
     options {
         timeout(time: 30, unit: 'MINUTES')
     }
